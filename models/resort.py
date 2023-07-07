@@ -13,6 +13,7 @@ class Resort(Base):
     value = Column(Integer)
     annual_return_investment = Column(Float)
     fractionated_percentage = Column(Float)
-    fractions_sold = Column(Integer)
+    fractions_sold = Column(Integer,default=0)
     fractions_available = Column(Integer)
+    total_fractions = Column(Integer)
     image_url = Column(String)

@@ -10,8 +10,9 @@ class ResortService():
         
     def create_resort(self,resort:Resort):
         new_resort = ResortModel(**resort.dict())
-        new_resort.fractions_available  = int((new_resort.value * (new_resort.fractionated_percentage / 100)) / self.fixed_cost_per_fraction)
-        
+        fractions  = int((new_resort.value * (new_resort.fractionated_percentage / 100)) / self.fixed_cost_per_fraction)
+        new_resort.total_fractions = fractions
+        new_resort.fractions_available = fractions
         self.db.add(new_resort)
         self.db.commit()
         self.db.refresh(new_resort)
@@ -38,7 +39,7 @@ class ResortService():
         
         for key, value in resort.items():
             setattr(result,key,value)
-        
+        result.total_fractions  = int((result.value * (result.fractionated_percentage / 100)) / self.fixed_cost_per_fraction)
         self.db.add(result)
         self.db.commit()
         self.db.refresh(result)
@@ -51,7 +52,19 @@ class ResortService():
         
         #pre-update
         result.fractionated_percentage = percent
-        result.fractions_available = available
+        result.total_fractions = available
+        result.fractions_available = result.total_fractions-result.fractions_sold
+        
+        self.db.add(result)
+        self.db.commit()
+        self.db.refresh(result)
+        self.db.close()
+        return
+    
+    def update_fractions_sold_resort(self,fractions:int,result:Resort):
+        #pre-update
+        result.fractions_sold += fractions
+        result.fractions_available = result.total_fractions-result.fractions_sold
         
         self.db.add(result)
         self.db.commit()

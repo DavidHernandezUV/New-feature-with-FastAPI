@@ -20,7 +20,10 @@ def get_resorts():
 
 @resort_router.get('/{id}',status_code=status.HTTP_200_OK, tags=["Resorts"],response_model=Resort,summary="This endpoint return a resort by id")
 def get_resort_by_id(id: int = Path(ge=1)):
-    
+    """
+    ## ARGS
+        - id: Int
+    """
     result = ResortService(Session()).get_resort_by_id(id)
     if not result:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Resort does NOT exist in the database."})
@@ -42,6 +45,10 @@ def create_resort(resort: Resort):
 
 @resort_router.delete('/{id}',status_code=status.HTTP_200_OK, tags=["Resorts"],response_model=Resort,summary="This endpoint delete a resort by id")
 def delete_resort_by_id(id: int = Path(ge=1)):
+    """
+    ## ARGS
+        - id: Int
+    """
     result = ResortService(Session()).delete_resort_by_id(id)
     if not result:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Resort does NOT exist in the database."})
@@ -51,6 +58,11 @@ def delete_resort_by_id(id: int = Path(ge=1)):
     
 @resort_router.patch('/{id}',status_code=status.HTTP_200_OK, tags=["Resorts"],response_model=Resort,summary="This endpoint update a resort by id")
 def update_resort_by_id(id: int, resort_updated: Resort):
+    """
+    ## ARGS
+        - id: Int
+        - resort_updated: Resort
+    """
     result = ResortService(Session()).get_resort_by_id(id)
     if not result:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Resort does NOT exist in the database."})
@@ -61,31 +73,34 @@ def update_resort_by_id(id: int, resort_updated: Resort):
 
 @resort_router.patch('/update_fractional_percent/{id}',status_code=status.HTTP_200_OK, tags=["Resorts"],response_model=Resort,summary="This endpoint update fractional percent of resort by id")
 def update_fractional_percent(id: int, percent: float):
+    """
+    ## ARGS
+        - id: Int
+        - percent: Float
+    ## Description
+        - This endpoint is used to update the fractional percent for a specific resort identified by its ID. It also automatically updates the available fractions.
+    """
     result = ResortService(Session()).get_resort_by_id(id)
     if not result:
         return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Resort does NOT exist in the database."})
     ResortService(Session()).update_fractional_percent_resort(percent,result)
-    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Resort was successfully updated."}) 
-    
-# @resort_router.put("/")
-# def update_resort(updated_resort: Resort):
-#     resort.name = updated_resort.name
-#     resort.location = updated_resort.location
-#     resort.annual_returns = updated_resort.annual_returns
-#     resort.fractionated_percentage = updated_resort.fractionated_percentage
-#     resort.image_url = updated_resort.image_url
-    
-#     # Calculate the number of fractions available based on the fractionated percentage
-#     total_resort_cost = 5000000  # Total cost of the resort
-#     fraction_cost = 50  # Cost of each fraction
-#     fractionated_percentage = resort.fractionated_percentage
-#     fractions_available = int((total_resort_cost * (fractionated_percentage / 100)) / fraction_cost)
-#     resort.fractions_available = fractions_available
-    
-#     return {"message": "Resort updated successfully."}
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Resort was successfully updated."})
 
-# @resort_router.post('/',status_code=status.HTTP_201_CREATED, tags=['Resorts'], response_model=Resort,summary="This endpoint create a resort")
-# def create_resort(resort:Resort):
-#     db = Session()
-#     new_resort = Resort(**resort.dict())
-#     return new_resort.dict()
+
+@resort_router.patch('/update_fractions_sold/{id}',status_code=status.HTTP_200_OK, tags=["Resorts"],response_model=Resort,summary="This endpoint update fractions sold of resort by id")
+def update_fractions_sold(id:int,fractions:int):
+    """
+    ## ARGS
+        - id: Int
+        - fractions: Float
+        
+    ## Description
+        - This endpoint is used to update the number of fractions sold for a specific resort identified by its ID. It also automatically updates the available fractions.
+    """
+    result = ResortService(Session()).get_resort_by_id(id)
+    if not result:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "Resort does NOT exist in the database."})
+    if result.fractions_available < fractions:
+        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"message": "The requested number of fractions exceeds the available fractions for the resort."})
+    ResortService(Session()).update_fractions_sold_resort(fractions,result)
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Resort fractions were successfully updated."})
