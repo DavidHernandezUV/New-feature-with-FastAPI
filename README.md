@@ -1,2 +1,6 @@
 # New-feature-with-FastAPI
-New feature challenge using FastAPI
+## RUN
+. venv/Scripts/activate
+pip install -r requirements.txt
+## Finally run server:
+uvicorn main:app --reload
