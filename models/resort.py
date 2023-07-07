@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column,Integer, String, Float
+from sqlalchemy import Column,Integer, String, Float, DateTime, func
 from config.database import Base
 
 
@@ -17,3 +17,4 @@ class Resort(Base):
     fractions_available = Column(Integer)
     total_fractions = Column(Integer)
     image_url = Column(String)
+    creation_date = Column(DateTime(timezone=True), default=func.now())

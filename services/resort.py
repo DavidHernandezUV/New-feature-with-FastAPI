@@ -1,7 +1,6 @@
 from models.resort import Resort as ResortModel
 from schema.resort import Resort
 
-
 class ResortService():
     
     def __init__(self,db) -> None:
@@ -36,7 +35,6 @@ class ResortService():
         return result
     
     def update_resort(self, resort: Resort, result: Resort):
-        
         for key, value in resort.items():
             setattr(result,key,value)
         result.total_fractions  = int((result.value * (result.fractionated_percentage / 100)) / self.fixed_cost_per_fraction)
@@ -47,9 +45,7 @@ class ResortService():
         return
     
     def update_fractional_percent_resort(self,percent:float,result:Resort):
-        
         available = int((result.value * (percent / 100)) / self.fixed_cost_per_fraction)
-        
         #pre-update
         result.fractionated_percentage = percent
         result.total_fractions = available
